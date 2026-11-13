@@ -1,0 +1,7 @@
+// 20auto-upgrades — managed by Ansible (ansible-server-hardening, updates role).
+// Refresh the package list daily and apply unattended upgrades daily.
+// The default /etc/apt/apt.conf.d/50unattended-upgrades already targets
+// the security pocket on Ubuntu, which is what we want here.
+APT::Periodic::Update-Package-Lists "1";
+APT::Periodic::Unattended-Upgrade "1";
+APT::Periodic::AutocleanInterval "7";

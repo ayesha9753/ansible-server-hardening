@@ -1,0 +1,19 @@
+# jail.local — managed by Ansible (ansible-server-hardening, fail2ban role).
+# Values come from group_vars/all.yml.
+
+[DEFAULT]
+# Never ban our own admin traffic sources by accident — extend as needed.
+ignoreip = 127.0.0.1/8 ::1
+bantime = {{ fail2ban_bantime }}
+findtime = {{ fail2ban_findtime }}
+maxretry = {{ fail2ban_maxretry }}
+backend = systemd
+
+[sshd]
+enabled = true
+port = {{ ssh_port }}
+filter = sshd
+logpath = /var/log/auth.log
+maxretry = {{ fail2ban_maxretry }}
+findtime = {{ fail2ban_findtime }}
+bantime = {{ fail2ban_bantime }}

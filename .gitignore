@@ -1,0 +1,20 @@
+# Ansible
+*.retry
+.ansible_facts_cache/
+__pycache__/
+
+# Ansible Vault — never commit vault files or vault passwords
+*vault*.yml
+.vault_pass
+vault_pass.txt
+
+# Inventory files with real hosts/secrets stay local
+inventory/production.ini
+inventory/hosts.local.ini
+
+# OS / editor basics
+.DS_Store
+*.swp
+*~
+.idea/
+.vscode/

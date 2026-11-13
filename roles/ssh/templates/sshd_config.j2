@@ -1,0 +1,39 @@
+# sshd_config — managed by Ansible (ansible-server-hardening, ssh role).
+# Manual edits will be overwritten. Validate changes with: sshd -t
+
+Port {{ ssh_port }}
+Protocol 2
+AddressFamily any
+
+# ─── Authentication ───────────────────────────────────────────────────────
+# Key-only access: no root login, no passwords, no keyboard-interactive.
+PermitRootLogin no
+PubkeyAuthentication yes
+PasswordAuthentication no
+KbdInteractiveAuthentication no
+ChallengeResponseAuthentication no
+PermitEmptyPasswords no
+
+# Limit guessing attempts per connection.
+MaxAuthTries 3
+LoginGraceTime 30
+
+# ─── Session behaviour ────────────────────────────────────────────────────
+# Disconnect idle sessions after 5 minutes idle, checking every 2 minutes.
+ClientAliveInterval 120
+ClientAliveCountMax 2
+TCPKeepAlive yes
+
+# ─── Hardening defaults ───────────────────────────────────────────────────
+X11Forwarding no
+AllowTcpForwarding no
+AllowAgentForwarding no
+PermitTunnel no
+PrintMotd no
+UsePAM yes
+
+# Only the admin user created by this playbook may log in over SSH.
+AllowUsers {{ admin_user }}
+
+# Accepted key types (modern algorithms only).
+PubkeyAcceptedAlgorithms ssh-ed25519,rsa-sha2-512,rsa-sha2-256

@@ -1,0 +1,43 @@
+---
+# ─── All tunable variables for the hardening playbook ─────────────────────
+# Edit this file before running against a real server.
+
+# Admin account that will be created and given passwordless sudo.
+admin_user: admin
+admin_shell: /bin/bash
+
+# Path (on the Ansible control node) to the PUBLIC key that will be
+# installed into the admin user's authorized_keys.
+# NOTE: point this at the .pub file, never the private key.
+admin_ssh_public_key_file: "~/.ssh/id_ed25519.pub"
+
+# SSH port. 22 is the safe default — only change it if you really want to,
+# and make sure your provider's external firewall (if any) allows it too.
+# The firewall role opens this port automatically via ufw_allowed_ports.
+ssh_port: 22
+
+# System timezone for the server, e.g. "UTC", "Asia/Karachi", "Europe/London".
+server_timezone: UTC
+
+# Base packages installed by the common role.
+base_packages:
+  - curl
+  - vim
+  - htop
+  - ufw
+  - unattended-upgrades
+
+# Incoming ports UFW will allow. SSH uses the ssh_port variable so the two
+# can never drift apart. Add/remove entries to suit the server's job.
+ufw_allowed_ports:
+  - { port: "{{ ssh_port }}", proto: tcp, comment: "SSH" }
+  - { port: 80, proto: tcp, comment: "HTTP" }
+  - { port: 443, proto: tcp, comment: "HTTPS" }
+
+# fail2ban SSH jail tuning.
+fail2ban_maxretry: 5      # failed attempts before a ban
+fail2ban_findtime: 600    # window in seconds those attempts are counted in
+fail2ban_bantime: 3600    # ban duration in seconds (1 hour)
+
+# Automatic security updates (unattended-upgrades).
+auto_updates_enabled: true

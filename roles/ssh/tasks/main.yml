@@ -1,0 +1,16 @@
+---
+# ssh — install the hardened sshd_config.
+# The config is rendered from a template and validated with `sshd -t`
+# BEFORE it replaces the live config, so a broken config can never be
+# installed. Keep an existing session open while testing (see README).
+
+- name: Install hardened sshd_config
+  ansible.builtin.template:
+    src: sshd_config.j2
+    dest: /etc/ssh/sshd_config
+    owner: root
+    group: root
+    mode: "0600"
+    # %s is the temp file Ansible uploads; sshd -t checks it in place.
+    validate: "sshd -t -f %s"
+  notify: Restart ssh

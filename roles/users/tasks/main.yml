@@ -1,0 +1,30 @@
+---
+# users — create the non-root admin account, give it sudo and an SSH key.
+# This role runs BEFORE the ssh role disables password authentication,
+# so the admin login path exists before the root/password doors close.
+
+- name: Create the admin user
+  ansible.builtin.user:
+    name: "{{ admin_user }}"
+    shell: "{{ admin_shell }}"
+    groups: sudo
+    append: true
+    create_home: true
+    state: present
+
+- name: Install the admin user's SSH public key
+  ansible.posix.authorized_key:
+    user: "{{ admin_user }}"
+    key: "{{ lookup('file', admin_ssh_public_key_file) }}"
+    state: present
+    manage_dir: true
+
+- name: Allow the admin user passwordless sudo
+  ansible.builtin.copy:
+    dest: "/etc/sudoers.d/{{ admin_user }}"
+    content: "{{ admin_user }} ALL=(ALL) NOPASSWD: ALL\n"
+    owner: root
+    group: root
+    mode: "0440"
+    # Never install a sudoers file that visudo rejects.
+    validate: "visudo -cf %s"

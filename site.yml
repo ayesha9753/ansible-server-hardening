@@ -1,0 +1,37 @@
+---
+# site.yml — take a fresh Ubuntu 22.04 VPS to a hardened baseline.
+#
+# Usage:
+#   Dry run:  ansible-playbook -i inventory/hosts.ini site.yml --check --diff
+#   Apply:    ansible-playbook -i inventory/hosts.ini site.yml
+#
+# SAFETY: keep an existing root/console session open while this runs.
+# The ssh role disables password auth — verify key login as the admin
+# user in a NEW session before closing the old one.
+
+- name: Harden Ubuntu 22.04 servers
+  hosts: servers
+  become: true
+  gather_facts: true
+
+  pre_tasks:
+    - name: Refuse to run against a non-Ubuntu 22.04 target
+      ansible.builtin.assert:
+        that:
+          - ansible_facts['distribution'] == "Ubuntu"
+          - ansible_facts['distribution_version'] == "22.04"
+        fail_msg: >-
+          This playbook is written for Ubuntu 22.04 only.
+          Target reports {{ ansible_facts['distribution'] }}
+          {{ ansible_facts['distribution_version'] }} — aborting.
+        success_msg: "Target is Ubuntu 22.04 — proceeding."
+
+    # NOTE: roles are ordered deliberately — users before ssh, so the admin
+    # account and its key exist before password authentication is turned off.
+  roles:
+    - common
+    - users
+    - ssh
+    - firewall
+    - fail2ban
+    - updates
